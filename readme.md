@@ -1,15 +1,23 @@
 # Node-Juncture
 
-Node-Juncture is a JavaScript module that bridges React with Node.js applications, providing graphical user interfaces for Node.js apps with real-time communication capabilities.
+Node-Juncture is a powerful module to build cross-platform desktop-like applications with Node.js and React, featuring a rich set of utilities for system interaction, window management, and native dialogs.
 
-## Features
+## Core Features
 
-- Easy integration with Express server
-- Real-time communication using Socket.IO
-- Unified package for both server and client components
-- Modular imports for server-only or client-only usage
-- State management with file persistence
-- Event broadcasting and subscription
+- **Real-time Bridge:** Seamless real-time communication between Node.js backend and React frontend.
+- **State Management:** Persistent state management on the server-side.
+- **Event-Driven:** Broadcast events from server to clients and handle commands from clients.
+
+## Desktop Utility Suite (`node-juncture/utils`)
+
+Transform your web app into a full-fledged desktop application with our utility suite:
+
+- **File System:** Access and manage files and folders (create, move, delete, list).
+- **Native Dialogs:** Open native file/folder selection dialogs and show system message boxes.
+- **Window Management:** List open windows, get the active window, and set windows to be "always on top".
+- **System Interaction:** Access clipboard, get detailed system information (CPU, RAM, OS), and open paths/URLs.
+- **Media & Display:** Take screenshots, control system volume, and get screen details.
+- **Native Notifications:** Display native desktop notifications.
 
 ## Installation
 
@@ -51,6 +59,63 @@ bridge.registerHandler("count", async (args) => {
 });
 
 app.start();
+```
+
+### Using the Desktop Utility Suite (`utils`)
+
+Combine the bridge with the `utils` module to create powerful desktop interactions.
+
+```javascript
+// server.js
+import { Juncture, utils } from 'node-juncture';
+const { dialogs, system } = utils;
+
+const app = new Juncture(3000);
+const bridge = app.bridge;
+
+// Let the user select a folder and get system info
+bridge.registerHandler('select-and-get-info', async () => {
+  const folder = await dialogs.selectFolderDialog();
+  const sysInfo = await system.getSystemInfo();
+  
+  const result = {
+    selectedFolder: folder,
+    os: sysInfo.os.distro,
+    cpu: sysInfo.cpu.brand,
+  };
+
+  await dialogs.showMessageBox('Info', `You selected: ${folder}\nOS: ${result.os}`);
+  
+  return result;
+});
+
+app.start();
+```
+
+```jsx
+// client.jsx
+import React from 'react';
+import bridge from '../utils/bridge';
+
+function SystemChecker() {
+  const [info, setInfo] = React.useState(null);
+
+  const handleCheckSystem = async () => {
+    try {
+      const result = await bridge.execute('select-and-get-info');
+      setInfo(result);
+    } catch (error) {
+      console.error('Could not get system info:', error);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={handleCheckSystem}>Select Folder & Get System Info</button>
+      {info && <pre>{JSON.stringify(info, null, 2)}</pre>}
+    </div>
+  );
+}
 ```
 
 ### Frontend (React)

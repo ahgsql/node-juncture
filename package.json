@@ -1,7 +1,7 @@
 {
   "name": "node-juncture",
   "version": "4.0.0",
-  "description": "A unified module for creating a bridge between React and Node.js applications, enabling graphical user interfaces for Node.js apps with real-time communication",
+  "description": "A powerful module to build cross-platform desktop-like applications with Node.js and React, featuring a rich set of utilities for system interaction, window management, and native dialogs.",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,12 +18,17 @@
     "./client": {
       "import": "./dist/client/index.js",
       "types": "./dist/client/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
     }
   },
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test:utils": "node sample/test-utils.js",
     "start:server": "node sample/server.js",
     "start:client": "cd sample/client && npm run dev"
   },
@@ -41,12 +46,19 @@
   "dependencies": {
     "express": "^4.18.2",
     "socket.io": "^4.6.1",
-    "socket.io-client": "^4.6.1"
+    "socket.io-client": "^4.6.1",
+    "trash": "^8.1.0",
+    "open": "^9.1.0",
+    "node-notifier": "^10.0.1",
+    "systeminformation": "^5.21.22",
+    "screenshot-desktop": "^1.12.7",
+    "loudness": "^0.4.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^18.16.0",
     "@types/socket.io-client": "3.0.0",
+    "@types/node-notifier": "^8.0.2",
     "typescript": "^5.0.4"
   },
   "files": [

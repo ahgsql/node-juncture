@@ -1,20 +1,28 @@
-# Juncture
+# Node-Juncture
 
-Juncture, React ile Node.js uygulamalarını birbirine bağlayarak Node.js uygulamalarına gerçek zamanlı iletişim yetenekleri ile grafiksel kullanıcı arayüzleri sağlayan bir JavaScript modülüdür.
+Node-Juncture, Node.js ve React ile platformlar arası masaüstü benzeri uygulamalar oluşturmak için güçlü bir modüldür ve sistem etkileşimi, pencere yönetimi ve yerel diyaloglar için zengin bir yardımcı program paketi sunar.
 
-## Özellikler
+## Ana Özellikler
 
-- Express sunucusu ile kolay entegrasyon
-- Socket.IO kullanarak gerçek zamanlı iletişim
-- Hem sunucu hem de istemci bileşenleri için birleşik paket
-- Sadece sunucu veya sadece istemci kullanımı için modüler import seçenekleri
-- Dosya kalıcılığı ile durum yönetimi
-- Olay yayınlama ve abone olma
+- **Gerçek Zamanlı Köprü:** Node.js arka ucu ile React ön ucu arasında kesintisiz gerçek zamanlı iletişim.
+- **Durum Yönetimi:** Sunucu tarafında kalıcı durum yönetimi.
+- **Olay Odaklı:** Sunucudan istemcilere olay yayınlama ve istemcilerden gelen komutları işleme.
+
+## Masaüstü Yardımcı Program Paketi (`node-juncture/utils`)
+
+Web uygulamanızı yardımcı program paketimizle tam teşekküllü bir masaüstü uygulamasına dönüştürün:
+
+- **Dosya Sistemi:** Dosya ve klasörlere erişin ve yönetin (oluşturma, taşıma, silme, listeleme).
+- **Yerel Dialoglar:** Yerel dosya/klasör seçme diyalogları açın ve sistem mesaj kutuları gösterin.
+- **Pencere Yönetimi:** Açık pencereleri listeleyin, aktif pencereyi alın ve pencereleri "her zaman üstte" olarak ayarlayın.
+- **Sistem Etkileşimi:** Panoya erişin, ayrıntılı sistem bilgileri (CPU, RAM, OS) alın ve yolları/URL'leri açın.
+- **Medya ve Ekran:** Ekran görüntüleri alın, sistem ses seviyesini kontrol edin ve ekran ayrıntılarını alın.
+- **Yerel Bildirimler:** Yerel masaüstü bildirimleri gösterin.
 
 ## Kurulum
 
 ```bash
-npm install juncture
+npm install node-juncture
 ```
 
 ## Temel Kullanım
@@ -22,7 +30,7 @@ npm install juncture
 ### Varsayılan Durum ile Sunucuyu Ayarlama
 
 ```javascript
-import { Juncture } from "juncture";
+import { Juncture } from "node-juncture";
 
 let varsayilanDurum = {
   sayac: 0,
@@ -57,8 +65,7 @@ uygulama.start();
 
 ```javascript
 // utils/bridge.js
-import { ReactBridge } from "juncture/client";
-// veya import { ReactBridge } from "juncture";
+import { ReactBridge } from "node-juncture/client";
 
 const bridge = new ReactBridge("http://localhost:3000");
 export default bridge;
@@ -91,8 +98,6 @@ function App() {
   useEffect(() => {
     bridge.on("sayacGuncelleme", (data) => {
       setSayac(data);
-    }, () => {
-      console.log("Sayaç güncellemeleri tamamlandı");
     });
 
     return () => {
@@ -115,17 +120,17 @@ export default App;
 
 ## Import Seçenekleri
 
-Juncture esnek import seçenekleri sunar:
+Node-Juncture esnek import seçenekleri sunar:
 
 ```javascript
 // Her şeyi import et
-import { Juncture, ExpressBridge, ReactBridge } from "juncture";
+import { Juncture, ExpressBridge, ReactBridge } from "node-juncture";
 
 // Sadece sunucu bileşenlerini import et
-import { Juncture, ExpressBridge } from "juncture/server";
+import { Juncture, ExpressBridge } from "node-juncture/server";
 
 // Sadece istemci bileşenlerini import et
-import { ReactBridge } from "juncture/client";
+import { ReactBridge } from "node-juncture/client";
 ```
 
 ## API

@@ -21,7 +21,7 @@ Sunucudan istemciye canlı veri iletimi, Juncture'ın en temel özelliklerinden 
 #### Sunucu Tarafı (Node.js)
 
 ```javascript
-import { Juncture } from 'juncture';
+import { Juncture } from 'node-juncture';
 
 // Sunucu başlangıç zamanı
 const serverStartTime = Date.now();
@@ -57,7 +57,7 @@ console.log("Sunucu başlatıldı, çalışma süresi yayını aktif.");
 
 ```javascript
 import { useState, useEffect } from 'react';
-import { ReactBridge } from 'juncture/client';
+import { ReactBridge } from 'node-juncture/client';
 
 function UptimeDisplay() {
   const [uptime, setUptime] = useState('00:00:00');
@@ -89,7 +89,7 @@ function UptimeDisplay() {
 #### Sunucu Tarafı (Node.js)
 
 ```javascript
-import { Juncture } from 'juncture';
+import { Juncture } from 'node-juncture';
 
 const app = new Juncture(3000);
 const bridge = app.bridge;
@@ -118,7 +118,7 @@ console.log("Sensör verisi yayını başlatıldı.");
 
 ```javascript
 import { useState, useEffect } from 'react';
-import { ReactBridge } from 'juncture/client';
+import { ReactBridge } from 'node-juncture/client';
 
 function SensorMonitor() {
   const [sensorData, setSensorData] = useState({
@@ -163,7 +163,7 @@ function SensorMonitor() {
 #### Sunucu Tarafı (Node.js)
 
 ```javascript
-import { Juncture } from 'juncture';
+import { Juncture } from 'node-juncture';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -204,7 +204,7 @@ console.log("Dosya listesi handler'ı kaydedildi.");
 
 ```javascript
 import { useState } from 'react';
-import { ReactBridge } from 'juncture/client';
+import { ReactBridge } from 'node-juncture/client';
 
 function FileExplorer() {
   const [directory, setDirectory] = useState('.');
@@ -265,7 +265,7 @@ function FileExplorer() {
 #### Sunucu Tarafı (Node.js)
 
 ```javascript
-import { Juncture } from 'juncture';
+import { Juncture } from 'node-juncture';
 
 const app = new Juncture(3000);
 const bridge = app.bridge;
@@ -309,7 +309,7 @@ console.log("Fibonacci hesaplama handler'ı kaydedildi.");
 
 ```javascript
 import { useState } from 'react';
-import { ReactBridge } from 'juncture/client';
+import { ReactBridge } from 'node-juncture/client';
 
 function FibonacciCalculator() {
   const [number, setNumber] = useState(10);
@@ -374,7 +374,7 @@ Sunucudan istemciye emir gönderme, sunucunun belirli bir istemciye veya tüm is
 #### Sunucu Tarafı (Node.js)
 
 ```javascript
-import { Juncture } from 'juncture';
+import { Juncture } from 'node-juncture';
 
 const app = new Juncture(3000);
 const bridge = app.bridge;
@@ -422,7 +422,7 @@ console.log("Bildirim sistemi aktif.");
 
 ```javascript
 import { useState, useEffect } from 'react';
-import { ReactBridge } from 'juncture/client';
+import { ReactBridge } from 'node-juncture/client';
 
 function NotificationSystem() {
   const [notifications, setNotifications] = useState([]);
@@ -516,7 +516,7 @@ function NotificationSystem() {
 #### Sunucu Tarafı (Node.js)
 
 ```javascript
-import { Juncture } from 'juncture';
+import { Juncture } from 'node-juncture';
 
 const app = new Juncture(3000);
 const bridge = app.bridge;
@@ -594,7 +594,7 @@ console.log("Uzaktan kontrol sistemi aktif.");
 
 ```javascript
 import { useState, useEffect } from 'react';
-import { ReactBridge } from 'juncture/client';
+import { ReactBridge } from 'node-juncture/client';
 
 function RemoteControl() {
   const [clients, setClients] = useState([]);
@@ -750,6 +750,118 @@ function RemoteControl() {
 
 ---
 
+## `utils` Modülü ile Masaüstü Entegrasyonu
+
+`node-juncture/utils` modülü, uygulamanıza platformlar arası masaüstü yetenekleri kazandırır.
+
+### Örnek 1: Sistem Bilgilerini Alma ve Bildirim Gösterme
+
+```javascript
+import { Juncture, utils } from 'node-juncture';
+const { system, notifications } = utils;
+
+const app = new Juncture(3000);
+const bridge = app.bridge;
+
+bridge.registerHandler('get-system-info', async () => {
+    const info = await system.getSystemInfo();
+    return {
+        cpu: `${info.cpu.manufacturer} ${info.cpu.brand}`,
+        memory: `${(info.memory.free / 1024 / 1024 / 1024).toFixed(2)} GB free`,
+        os: info.os.distro
+    };
+});
+
+bridge.registerHandler('show-notification', async (args) => {
+    await notifications.showNotification({
+        title: args.title || 'Bilgilendirme',
+        message: args.message || 'Bu bir test bildirimidir.'
+    });
+    return { success: true };
+});
+
+app.start();
+```
+
+### Örnek 2: Masaüstü Otomasyonu - Ekran Görüntüsü Al ve Klasör Seç
+
+Bu örnek, bir düğmeye tıklandığında ekran görüntüsü alır, kullanıcıdan bir kaydetme konumu seçmesini ister ve dosyayı oraya kaydeder.
+
+```javascript
+// server.js
+import { Juncture, utils } from 'node-juncture';
+import path from 'path';
+import fs from 'fs';
+
+const { media, dialogs, fileSystem } = utils;
+
+const app = new Juncture(3000);
+const bridge = app.bridge;
+
+bridge.registerHandler('take-and-save-screenshot', async () => {
+    try {
+        // Geçici bir dosyaya ekran görüntüsü al
+        const tempPath = path.join(process.cwd(), 'temp_screenshot.png');
+        await media.takeScreenshot(tempPath);
+
+        // Kullanıcıdan bir klasör seçmesini iste
+        const targetFolder = await dialogs.selectFolderDialog();
+        if (!targetFolder) {
+            fs.unlinkSync(tempPath); // Kullanıcı iptal ederse geçici dosyayı sil
+            return { success: false, message: 'Klasör seçimi iptal edildi.' };
+        }
+
+        // Dosyayı seçilen klasöre taşı
+        const finalPath = path.join(targetFolder, `screenshot-${Date.now()}.png`);
+        fileSystem.movePath(tempPath, finalPath);
+
+        await dialogs.showMessageBox('Başarılı', `Ekran görüntüsü şuraya kaydedildi: ${finalPath}`);
+        
+        return { success: true, path: finalPath };
+
+    } catch (error) {
+        console.error(error);
+        await dialogs.showMessageBox('Hata', `Bir hata oluştu: ${error.message}`, 'error');
+        return { success: false, message: error.message };
+    }
+});
+
+app.start();
+```
+
+```jsx
+// client.jsx
+import React from 'react';
+import bridge from '../utils/bridge';
+
+function ScreenshotTool() {
+  const [status, setStatus] = React.useState('');
+
+  const handleScreenshot = async () => {
+    setStatus('Ekran görüntüsü alınıyor...');
+    try {
+      const result = await bridge.execute('take-and-save-screenshot');
+      if (result.success) {
+        setStatus(`Kaydedildi: ${result.path}`);
+      } else {
+        setStatus(`İşlem iptal edildi: ${result.message}`);
+      }
+    } catch (error) {
+      setStatus(`Hata: ${error.message}`);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={handleScreenshot}>Ekran Görüntüsü Al ve Kaydet</button>
+      <p>{status}</p>
+    </div>
+  );
+}
+```
+
+---
+
 ## Durum Yönetimi
 
 Juncture, sunucu tarafında durum yönetimi için yerleşik destek sağlar. Bu, uygulamanın durumunu sunucuda saklamanızı ve istemcilere iletmenizi sağlar.
@@ -759,7 +871,7 @@ Juncture, sunucu tarafında durum yönetimi için yerleşik destek sağlar. Bu, 
 #### Sunucu Tarafı (Node.js)
 
 ```javascript
-import { Juncture } from 'juncture';
+import { Juncture } from 'node-juncture';
 
 // Varsayılan durum
 const defaultState = {
@@ -830,7 +942,7 @@ console.log("Durum yönetimi aktif.");
 
 ```javascript
 import { useState, useEffect } from 'react';
-import { ReactBridge } from 'juncture/client';
+import { ReactBridge } from 'node-juncture/client';
 
 function StateManager() {
   const [state, setState] = useState({
