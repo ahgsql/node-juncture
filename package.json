@@ -1,6 +1,6 @@
 {
   "name": "node-juncture",
-  "version": "4.0.0",
+  "version": "4.2.0",
   "description": "A powerful module to build cross-platform desktop-like applications with Node.js and React, featuring a rich set of utilities for system interaction, window management, and native dialogs.",
   "main": "dist/index.js",
   "module": "dist/index.js",

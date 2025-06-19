@@ -6,7 +6,7 @@ dist/
 client/
 # Environment variables
 .env
-
+NODE_JUNCTURE_COMPLETE_GUIDE.md
 # Logs
 logs
 *.log
