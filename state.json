@@ -1,0 +1,48 @@
+{
+  "counter": 87,
+  "messages": [
+    {
+      "id": 1745236518461,
+      "user": "test",
+      "text": "test",
+      "timestamp": "2025-04-21T11:55:18.461Z"
+    },
+    {
+      "id": 1745236526635,
+      "user": "at",
+      "text": "aa",
+      "timestamp": "2025-04-21T11:55:26.635Z"
+    },
+    {
+      "id": 1745236529784,
+      "user": "test",
+      "text": "aerer",
+      "timestamp": "2025-04-21T11:55:29.784Z"
+    },
+    {
+      "id": 1745236919735,
+      "user": "qe",
+      "text": "qe",
+      "timestamp": "2025-04-21T12:01:59.735Z"
+    },
+    {
+      "id": 1745236928510,
+      "user": "qe",
+      "text": "qq",
+      "timestamp": "2025-04-21T12:02:08.510Z"
+    },
+    {
+      "id": 1745236933690,
+      "user": "qed",
+      "text": "rr",
+      "timestamp": "2025-04-21T12:02:13.690Z"
+    }
+  ],
+  "users": [
+    "test",
+    "at",
+    "qe",
+    "qed"
+  ],
+  "lastUpdate": "2025-04-21T12:02:13.691Z"
+}

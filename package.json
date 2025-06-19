@@ -1,0 +1,72 @@
+{
+  "name": "node-juncture",
+  "version": "4.0.0",
+  "description": "A unified module for creating a bridge between React and Node.js applications, enabling graphical user interfaces for Node.js apps with real-time communication",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server/index.js",
+      "types": "./dist/server/index.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client/index.js",
+      "types": "./dist/client/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:server": "node sample/server.js",
+    "start:client": "cd sample/client && npm run dev"
+  },
+  "keywords": [
+    "react",
+    "node.js",
+    "express",
+    "vite",
+    "bridge",
+    "socket.io",
+    "real-time"
+  ],
+  "author": "ahgsql",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "socket.io-client": "^4.6.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^18.16.0",
+    "@types/socket.io-client": "3.0.0",
+    "typescript": "^5.0.4"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "README-tr.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahgsql/node-juncture"
+  },
+  "bugs": {
+    "url": "https://github.com/ahgsql/node-juncture/issues"
+  },
+  "homepage": "https://github.com/ahgsql/node-juncture#readme",
+  "contributors": [
+    {
+      "name": "ahgsql",
+      "url": "https://github.com/ahgsql"
+    }
+  ]
+}
