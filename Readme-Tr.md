@@ -179,6 +179,149 @@ new ReactBridge(url)
 - `on(event, callback, done)`: İsteğe bağlı tamamlama geri çağrısı ile bir olayı dinler
 - `off(event)`: Bir olayı dinlemeyi durdurur
 
+## Paketleme
+
+Node-Juncture, uygulamanız için dağıtılabilir paketler oluşturmak üzere bir `package` komutu sağlar. Bu komut, Node.js kurulumunu, bağımlılık kurulumunu ve uygulama başlangıcını yöneten `.bat` ve `.sh` betikleri oluşturur.
+
+### Standart Proje Yapısı
+
+Bir Node-Juncture uygulaması aşağıdaki proje yapısına sahip olmalıdır:
+
+```
+my-app/
+├── client/
+├── server/
+│   └── entry.js
+└── juncture.config.cjs
+```
+
+- `client/`: İstemci tarafı uygulamasını içerir (örneğin, bir React uygulaması).
+- `server/`: Sunucu tarafı uygulamasını içerir.
+- `server/entry.js`: Sunucu uygulaması için ana giriş noktası.
+- `juncture.config.cjs`: Paketleme işlemi için yapılandırma dosyası.
+
+### `juncture.config.cjs`
+
+`juncture.config.cjs` dosyası, aşağıdaki özelliklere sahip bir JavaScript nesnesi dışa aktarmalıdır:
+
+```javascript
+module.exports = {
+  serverPort: 3000,
+  clientPort: 5173,
+  clientCommand: 'npm run dev',
+  serverEntry: 'server/entry.js',
+};
+```
+
+- `serverPort`: Sunucunun çalışacağı port.
+- `clientPort`: İstemcinin çalışacağı port.
+- `clientCommand`: İstemci uygulamasını başlatmak için komut (örneğin, 'npm run dev').
+- `serverEntry`: Sunucu uygulaması için ana giriş noktasının yolu.
+
+### `package` Komutu
+
+Uygulamanızı paketlemek için aşağıdaki komutu çalıştırın:
+
+```bash
+juncture package <uygulamaYolu>
+```
+
+- `<uygulamaYolu>`: Node-Juncture uygulamanızın yolu.
+
+`package` komutu, uygulama dizininizin kökünde `start.bat` ve `start.sh` betikleri oluşturur. Bu betikler, uygulamanızı Windows, macOS ve Linux'ta başlatmak için kullanılabilir.
+
+### Yapılandırma Değerlerini Kullanma
+
+`juncture.config.cjs` dosyanızdaki değerleri sunucu ve istemci kodunuzda kullanabilirsiniz.
+
+**Sunucu:**
+
+```javascript
+// server/entry.js
+import { Juncture } from 'node-juncture';
+import config from '../juncture.config.cjs';
+
+const app = new Juncture(config.serverPort);
+// ...
+```
+
+**İstemci (Vite):**
+
+Vite uygulamanızda yapılandırma değerlerini kullanmak için `vite.config.js` dosyanızdaki `define` seçeneğini kullanarak bir global değişken oluşturabilirsiniz:
+
+```javascript
+// vite.config.js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import config from './juncture.config.cjs';
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: config.clientPort,
+  },
+  define: {
+    'process.env.JUNCTURE_CONFIG': JSON.stringify(config)
+  }
+});
+```
+
+Ardından, istemci tarafı kodunuzda yapılandırma değerlerine şu şekilde erişebilirsiniz:
+
+```javascript
+// src/bridge.js
+import { ReactBridge } from 'node-juncture/client';
+
+const bridge = new ReactBridge(`http://localhost:${process.env.JUNCTURE_CONFIG.serverPort}`);
+
+export default bridge;
+```
+
+### Yapılandırma Değerlerini Kullanma
+
+`juncture.config.cjs` dosyanızdaki değerleri sunucu ve istemci kodunuzda kullanabilirsiniz.
+
+**Sunucu:**
+
+```javascript
+// server/entry.js
+import { Juncture } from 'node-juncture';
+import config from '../juncture.config.cjs';
+
+const app = new Juncture(config.serverPort);
+// ...
+```
+
+**İstemci (Vite):**
+
+Vite uygulamanızda `clientPort`'u kullanmak için `vite.config.js` dosyanızdaki `define` seçeneğini kullanabilirsiniz:
+
+```javascript
+// vite.config.js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import config from './juncture.config.cjs';
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: config.clientPort,
+  },
+});
+```
+
+Ardından, istemci tarafı kodunuzda porta şu şekilde erişebilirsiniz:
+
+```javascript
+// src/bridge.js
+import { ReactBridge } from 'node-juncture/client';
+import config from '../juncture.config.cjs';
+
+const bridge = new ReactBridge(`http://localhost:${config.serverPort}`);
+
+export default bridge;
+```
+
 ## Örnekler
 
 Tam örnekler için `sample` dizinine bakın:

@@ -236,6 +236,104 @@ new ReactBridge(url)
 - `on(event, callback, done)`: Listens for an event with optional completion callback
 - `off(event)`: Stops listening for an event
 
+## Packaging
+
+Node-Juncture provides a `package` command to create distributable packages for your application. This command generates `.bat` and `.sh` scripts that handle Node.js installation, dependency installation, and application startup.
+
+### Standard Project Structure
+
+A Node-Juncture application should have the following project structure:
+
+```
+my-app/
+├── client/
+├── server/
+│   └── entry.js
+└── juncture.config.cjs
+```
+
+- `client/`: Contains the client-side application (e.g., a React app).
+- `server/`: Contains the server-side application.
+- `server/entry.js`: The main entry point for the server application.
+- `juncture.config.cjs`: The configuration file for the packaging process.
+
+### `juncture.config.cjs`
+
+The `juncture.config.cjs` file should export a JavaScript object with the following properties:
+
+```javascript
+module.exports = {
+  serverPort: 3000,
+  clientPort: 5173,
+  clientCommand: 'npm run dev',
+  serverEntry: 'server/entry.js',
+};
+```
+
+- `serverPort`: The port the server will run on.
+- `clientPort`: The port the client will run on.
+- `clientCommand`: The command to start the client application (e.g., 'npm run dev').
+- `serverEntry`: The path to the main entry point for the server application.
+
+### `package` Command
+
+To package your application, run the following command:
+
+```bash
+juncture package <appPath>
+```
+
+- `<appPath>`: The path to your Node-Juncture application.
+
+The `package` command will generate `start.bat` and `start.sh` scripts in the root of your application directory. These scripts can be used to start your application on Windows, macOS, and Linux.
+
+### Using Configuration Values
+
+You can use the values from your `juncture.config.cjs` file in your server and client code.
+
+**Server:**
+
+```javascript
+// server/entry.js
+import { Juncture } from 'node-juncture';
+import config from '../juncture.config.cjs';
+
+const app = new Juncture(config.serverPort);
+// ...
+```
+
+**Client (Vite):**
+
+To use the configuration values in your Vite application, you can use the `define` option in your `vite.config.js` file to create a global variable:
+
+```javascript
+// vite.config.js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import config from './juncture.config.cjs';
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: config.clientPort,
+  },
+  define: {
+    'process.env.JUNCTURE_CONFIG': JSON.stringify(config)
+  }
+});
+```
+
+Then, in your client-side code, you can access the configuration values like this:
+
+```javascript
+// src/bridge.js
+import { ReactBridge } from 'node-juncture/client';
+
+const bridge = new ReactBridge(`http://localhost:${process.env.JUNCTURE_CONFIG.serverPort}`);
+
+export default bridge;
+```
+
 ## Examples
 
 Check the `sample` directory for complete examples:
