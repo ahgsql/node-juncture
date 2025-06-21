@@ -2,8 +2,8 @@
 
 import { exec } from 'child_process';
 import { program } from 'commander';
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import inquirer from 'inquirer';
 import { pathToFileURL } from 'url';
 
@@ -13,6 +13,43 @@ program
     .action(async (appPath: string) => {
         await packageApp(appPath);
     });
+
+
+async function archiveApp(appPath: string, outputPath: string) {
+  console.log(`Archiving app at ${appPath} to ${outputPath}`);
+
+  let AdmZip;
+  try {
+    AdmZip = (await import('adm-zip')).default;
+  } catch (e) {
+    console.error("Failed to load adm-zip", e);
+    return;
+  }
+  const zip = new AdmZip();
+
+  const addDirectory = (dirPath: string, zipPath: string) => {
+    fs.readdirSync(dirPath).forEach(item => {
+      const itemPath = path.join(dirPath, item);
+      const itemZipPath = path.join(zipPath, item);
+
+      if (item === 'node_modules') {
+        return;
+      }
+
+      if (fs.statSync(itemPath).isDirectory()) {
+        addDirectory(itemPath, itemZipPath);
+      } else {
+        zip.addLocalFile(itemPath, zipPath);
+      }
+    });
+  };
+
+  addDirectory(appPath, '');
+
+  zip.writeZip(outputPath);
+
+  console.log(`App archived to ${outputPath}`);
+}
 
 async function packageApp(appPath: string) {
   const configPath = path.join(appPath, 'juncture.config.cjs');
@@ -110,5 +147,12 @@ async function packageApp(appPath: string) {
 
   console.log('Windows and Linux/macOS packages created successfully!');
 }
+
+program
+    .command('archive <appPath> <outputPath>')
+    .description('Archive a Node-Juncture application')
+    .action(async (appPath: string, outputPath: string) => {
+        await archiveApp(appPath, outputPath);
+    });
 
 program.parse(process.argv);
